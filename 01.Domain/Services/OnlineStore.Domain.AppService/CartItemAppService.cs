@@ -16,7 +16,7 @@ namespace OnlineStore.Domain.AppService
 
             var totalPrice = items.Sum(i => i.UnitPrice * i.Quantity);
 
-            var message = $"سبد خرید با موفقیت دریافت شد. جمع کل: {totalPrice:N0} تومان";
+            var message = $"سبد خرید با موفقیت دریافت شد. جمع کل: {totalPrice:N0} $";
 
             return Result<List<CartItemDto>>.Success(message, items);
         }

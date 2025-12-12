@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\02.Infrastructure\DataAccess\OnlineStore.Infra.Repository\OnlineStore.Infra.Repository.csproj" />
+    <ProjectReference Include="..\..\Core\OnlineStore.Domain.Core\OnlineStore.Domain.Core.csproj" />
+  </ItemGroup>
+
+</Project>

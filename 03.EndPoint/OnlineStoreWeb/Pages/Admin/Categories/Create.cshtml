@@ -1,0 +1,64 @@
+﻿@page
+@model OnlineStoreWeb.Pages.Admin.Categories.CreateModel
+@{
+    ViewData["Title"] = "ایجاد دسته‌بندی جدید";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h3 class="mb-4 text-primary">
+            ایجاد دسته‌بندی جدید
+        </h3>
+
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                @Model.SuccessMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger alert-dismissible fade show">
+                @Model.ErrorMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="post">
+                    <div class="mb-3">
+                        <label asp-for="Category.Name" class="form-label">
+                            نام دسته‌بندی <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="Category.Name" class="form-control" placeholder="مثال: لپ‌تاپ و کامپیوتر" />
+                        <span asp-validation-for="Category.Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Category.Description" class="form-label">
+                            توضیحات (اختیاری)
+                        </label>
+                        <textarea asp-for="Category.Description" class="form-control" rows="4"
+                                  placeholder="مثال: شامل لپ‌تاپ‌های گیمینگ، اداری و دانشجویی"></textarea>
+                        <span asp-validation-for="Category.Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-success btn-lg px-5">
+                            ایجاد دسته‌بندی
+                        </button>
+                        <a asp-page="./Index" class="btn btn-secondary btn-lg">
+                            بازگشت به لیست
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

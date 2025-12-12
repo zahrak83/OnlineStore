@@ -1,0 +1,64 @@
+﻿@page
+@model OnlineStoreWeb.Pages.Admin.Products.IndexModel
+@{
+    ViewData["Title"] = "مدیریت محصولات";
+}
+
+<h3 class="mb-4">
+    <i class="bi bi-box-seam"></i> مدیریت محصولات
+    <a asp-page="Create" class="btn btn-success btn-sm float-start">
+        <i class="bi bi-plus-lg"></i> افزودن محصول جدید
+    </a>
+</h3>
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <div class="alert alert-success">@Model.SuccessMessage</div>
+}
+
+<table class="table table-hover align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>عکس</th>
+            <th>عنوان</th>
+            <th>قیمت</th>
+            <th>موجودی</th>
+            <th>دسته‌بندی</th>
+            <th>عملیات</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model.Products)
+        {
+            <tr>
+                <td>
+                    @if (p.Images.Any())
+                    {
+                        <img src="@p.Images.First()" width="50" class="rounded" />
+                    }
+                    else
+                    {
+                        <i class="bi bi-image text-muted"></i>
+                    }
+                </td>
+                <td><strong>@p.Title</strong></td>
+                <td>@String.Format("{0:N0}", p.Price) تومان</td>
+                <td>
+                    <span class="@(p.Stock <= 5 ? "text-danger fw-bold" : "")">
+                        @p.Stock
+                        @(p.Stock <= 5 ? " (کم)" : "")
+                    </span>
+                </td>
+                <td>@p.CategoryName</td>
+                <td>
+                    <a asp-page="Edit" asp-route-id="@p.Id" class="btn btn-warning btn-sm">ویرایش</a>
+                    <a asp-page="Stock" asp-route-id="@p.Id" class="btn btn-info btn-sm">موجودی</a>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@p.Id" class="d-inline"
+                          onsubmit="return confirm('آیا از حذف این محصول اطمینان دارید؟');">
+                        <button type="submit" class="btn btn-danger btn-sm">حذف</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

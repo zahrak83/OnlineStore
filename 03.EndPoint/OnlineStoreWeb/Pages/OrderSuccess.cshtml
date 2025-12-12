@@ -1,0 +1,27 @@
+﻿@page "{id:int}"
+@model OnlineStoreWeb.Pages.OrderSuccessModel
+@{
+    ViewData["Title"] = "سفارش با موفقیت ثبت شد";
+}
+
+<div class="container mt-5 text-center">
+    <div class="alert alert-success p-5">
+        <h1 class="display-4 text-success">
+            سفارش شما با موفقیت ثبت شد!
+        </h1>
+        <hr />
+        <p class="lead">
+            شماره سفارش شما:
+            <strong class="text-primary fs-3">#@Model.OrderId</strong>
+        </p>
+        <p>ممنون از خرید شما</p>
+        <div class="mt-4">
+            <a asp-page="/Index" class="btn btn-primary btn-lg mx-2">
+                بازگشت به فروشگاه
+            </a>
+            <a asp-page="/Admin/Orders/Details" asp-route-id="@Model.OrderId" class="btn btn-outline-secondary btn-lg mx-2">
+                مشاهده جزئیات سفارش
+            </a>
+        </div>
+    </div>
+</div>

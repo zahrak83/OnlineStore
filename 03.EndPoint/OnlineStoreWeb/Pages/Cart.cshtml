@@ -1,0 +1,80 @@
+﻿@page
+@model OnlineStoreWeb.Pages.CartModel
+@{
+    ViewData["Title"] = "سبد خرید";
+}
+
+<h2 class="mb-4">سبد خرید شما</h2>
+
+@if (Model.CartItems == null || !Model.CartItems.Any())
+{
+    <div class="alert alert-info">
+        سبد خرید شما خالی است.
+    </div>
+    return;
+}
+
+<table class="table table-bordered align-middle">
+    <thead class="table-light">
+        <tr>
+            <th>محصول</th>
+            <th class="text-center">تعداد</th>
+            <th>قیمت واحد</th>
+            <th>مجموع</th>
+            <th>عملیات</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model.CartItems)
+        {
+            <tr>
+                <td>
+                    <strong>@item.ProductTitle</strong>
+                </td>
+
+                <td class="text-center">
+                    <form method="post" asp-page-handler="Decrease" class="d-inline">
+                        <input type="hidden" name="productId" value="@item.ProductId" />
+
+                        <button class="btn btn-outline-secondary btn-sm">-</button>
+                    </form>
+
+                    <span class="mx-2">@item.Quantity</span>
+
+                    <form method="post" asp-page-handler="Increase" class="d-inline">
+                        <input type="hidden" name="productId" value="@item.ProductId" />
+
+                        <button class="btn btn-outline-secondary btn-sm">+</button>
+                    </form>
+                </td>
+
+                <td>@String.Format("{0:N0}", item.UnitPrice) تومان</td>
+
+                <td>@String.Format("{0:N0}", (item.UnitPrice * item.Quantity)) تومان</td>
+
+                <td>
+                    <form method="post" asp-page-handler="Remove">
+                        <input type="hidden" name="productId" value="@item.ProductId" />
+
+                        <button class="btn btn-danger btn-sm">حذف</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="text-end mt-3">
+    <h4>
+        جمع کل:
+        <strong>@String.Format("{0:N0}", Model.TotalPrice)</strong>
+        تومان
+    </h4>
+</div>
+
+<div class="text-end mt-4">
+    <a asp-page="/Checkout" class="btn btn-success btn-lg">
+        ثبت سفارش و تسویه حساب
+    </a>
+</div>

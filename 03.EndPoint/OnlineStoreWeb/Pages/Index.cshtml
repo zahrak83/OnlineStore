@@ -1,0 +1,130 @@
+﻿@page
+@model OnlineStore.Web.Pages.IndexModel
+@{
+    ViewData["Title"] = "فروشگاه اینترنتی";
+}
+
+<header class="bg-primary text-white py-5 mb-4">
+    <div class="container">
+        <h1 class="display-6">به فروشگاه اینترنتی خوش‌آمدید</h1>
+        <p class="lead">محصولات با کیفیت، قیمت مناسب</p>
+    </div>
+</header>
+
+<div class="container">
+    <div class="row">
+
+
+        <aside class="col-lg-3 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">فیلتر و جستجو</h5>
+
+                    <form method="get" asp-page="./Index" class="mb-3" novalidate>
+                        <div class="mb-2">
+                            <label for="searchInput" class="form-label">جستجوی محصول</label>
+                            <input type="text" id="searchInput" name="Search" value="@Model.Search"
+                                   class="form-control @(ViewData.ModelState.ContainsKey(nameof(Model.Search)) &&
+                                                                                           ViewData.ModelState[nameof(Model.Search)].Errors.Count > 0 ? "is-invalid" : "")"
+                                   maxlength="100" placeholder="نام محصول..." />
+
+                            <div class="invalid-feedback">
+                                @foreach (var err in ViewData.ModelState[nameof(Model.Search)]?.Errors
+                                                                ?? Enumerable.Empty<Microsoft.AspNetCore.Mvc.ModelBinding.ModelError>())
+                                {
+                                    <div>@err.ErrorMessage</div>
+                                }
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="CategoryId" value="@(Model.CategoryId ?? 0)" />
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">جستجو</button>
+                        </div>
+                    </form>
+
+                    <hr />
+
+                    <h6>دسته‌بندی‌ها</h6>
+                    <ul class="list-group">
+
+                        <li class="list-group-item @(Model.CategoryId == null || Model.CategoryId == 0 ? "active" : "")">
+                            <a class="d-block text-decoration-none @(Model.CategoryId == null || Model.CategoryId == 0 ? "text-white" : "")"
+                               href="@Url.Page("./Index", new { CategoryId = (int?)null, Search = Model.Search, Sort = Model.Sort })">
+                                همه
+                            </a>
+                        </li>
+
+                        @foreach (var cat in Model.Categories)
+                        {
+                            <li class="list-group-item @(Model.CategoryId == cat.Id ? "active" : "")">
+                                <a class="d-block text-decoration-none @(Model.CategoryId == cat.Id ? "text-white" : "")"
+                                   href="@Url.Page("./Index", new { CategoryId = cat.Id, Search = Model.Search, Sort = Model.Sort })">
+                                    @cat.Name
+                                </a>
+                            </li>
+                        }
+                    </ul>
+
+                </div>
+            </div>
+        </aside>
+
+
+        <main class="col-lg-9">
+
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger">@Model.ErrorMessage</div>
+            }
+
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+
+                @if (Model.Products != null && Model.Products.Any())
+                {
+                    foreach (var p in Model.Products)
+                    {
+                        var imagePath = p.Images?.FirstOrDefault() ?? "/images/placeholder.png";
+
+                        <div class="col">
+                            <div class="card h-100">
+                                <img src="@imagePath"
+                                     class="card-img-top"
+                                     style="object-fit:cover;height:180px;"
+                                     alt="@p.Title" />
+
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">@p.Title</h5>
+                                    <p class="card-text text-truncate">@p.Description</p>
+
+                                    <div class="mt-auto">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <strong class="fs-5">@String.Format("{0:N0}", p.Price) $</strong>
+
+                                            <span class="badge @(p.Stock > 0 ? "bg-success" : "bg-danger")">
+                                                @(p.Stock > 0 ? $"موجود: {p.Stock}" : "ناموجود")
+                                            </span>
+                                        </div>
+
+                                        <a asp-page="/ProductDetails" asp-route-id="@p.Id" class="stretched-link"></a>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12">
+                        <div class="alert alert-info">هیچ محصولی یافت نشد.</div>
+                    </div>
+                }
+
+            </div>
+
+        </main>
+    </div>
+</div>

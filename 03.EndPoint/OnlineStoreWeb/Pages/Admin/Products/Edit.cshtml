@@ -1,0 +1,128 @@
+﻿@page "{id:int}"
+@model OnlineStoreWeb.Pages.Admin.Products.EditModel
+@{
+    ViewData["Title"] = "ویرایش محصول";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-9">
+        <h3 class="mb-4 text-primary">
+            ویرایش محصول: <strong>@Model.Product.Title</strong>
+        </h3>
+
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                @Model.SuccessMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger alert-dismissible fade show">
+                @Model.ErrorMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="Product.Id" />
+
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="mb-3">
+                                <label asp-for="Product.Title" class="form-label">عنوان محصول *</label>
+                                <input asp-for="Product.Title" class="form-control" />
+                                <span asp-validation-for="Product.Title" class="text-danger"></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="Product.Price" class="form-label">قیمت (تومان) *</label>
+                                        <input asp-for="Product.Price" class="form-control" />
+                                        <span asp-validation-for="Product.Price" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="Product.Stock" class="form-label">موجودی *</label>
+                                        <input asp-for="Product.Stock" class="form-control" />
+                                        <span asp-validation-for="Product.Stock" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Product.CategoryId" class="form-label">دسته‌بندی *</label>
+                                <select asp-for="Product.CategoryId" class="form-select" asp-items="@(new SelectList(Model.Categories, "Id", "Name"))">
+                                    <option value="">-- انتخاب کنید --</option>
+                                </select>
+                                <span asp-validation-for="Product.CategoryId" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Product.Description" class="form-label">توضیحات</label>
+                                <textarea asp-for="Product.Description" class="form-control" rows="5"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Product.ImageFiles" class="form-label">اضافه کردن تصاویر جدید</label>
+                                <input asp-for="Product.ImageFiles" type="file" class="form-control" accept="image/*" multiple />
+                                <div class="form-text">می‌تونید تصاویر جدید اضافه کنید</div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="border rounded p-3 bg-light">
+                                <h5>تصاویر فعلی (@Model.CurrentImages.Count)</h5>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @foreach (var img in Model.CurrentImages)
+                                    {
+                                        <div class="position-relative">
+                                            <img src="@img" class="rounded shadow-sm" style="width:90px;height:90px;object-fit:cover;" />
+                                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 start-0 translate-middle-x"
+                                                    onclick="removeImage('@img', this)">
+                                                ×
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                                @if (!Model.CurrentImages.Any())
+                                {
+                                    <p class="text-muted text-center">هنوز تصویری ثبت نشده</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-warning btn-lg px-5">
+                            ذخیره تغییرات
+                        </button>
+                        <a asp-page="./Index" class="btn btn-secondary btn-lg">بازگشت</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function removeImage(path, btn) {
+            if (!confirm("آیا از حذف این تصویر مطمئنید؟")) return;
+            btn.parentElement.remove();
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'RemovedImages';
+            input.value = path;
+            document.querySelector('form').appendChild(input);
+        }
+    </script>
+}

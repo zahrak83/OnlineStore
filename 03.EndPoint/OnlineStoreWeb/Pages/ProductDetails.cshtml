@@ -1,0 +1,92 @@
+﻿@page "{id:int}"
+@model OnlineStoreWeb.Pages.ProductDetailsModel
+@{
+    ViewData["Title"] = "جزئیات محصول";
+}
+
+@if (Model.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<div class="container my-5">
+    <div class="row">
+
+        <div class="col-md-6 text-center">
+            <img class="img-fluid rounded shadow-sm"
+                 style="max-height:450px; object-fit:cover;"
+                 src="@(Model.Product.Images.FirstOrDefault() ?? "/images/no-image.png")"
+                 alt="@Model.Product.Title" />
+        </div>
+
+        <div class="col-md-6">
+            <h2 class="fw-bold">@Model.Product.Title</h2>
+
+            <h4 class="text-primary my-3">@String.Format("{0:N0}", Model.Product.Price) تومان</h4>
+
+            <p>@Model.Product.Description</p>
+
+            <p>
+                <span class="badge @(Model.Product.Stock > 0 ? "bg-success" : "bg-danger")">
+                    @(Model.Product.Stock > 0 ? $"موجودی: {Model.Product.Stock}" : "ناموجود")
+                </span>
+            </p>
+
+
+            @if (Model.Product.Stock > 0)
+            {
+                <div class="mt-4 d-flex align-items-center">
+
+                    <button type="button" class="btn btn-outline-secondary" id="decreaseBtn">-</button>
+
+                    <input type="number" name="Quantity" id="quantityInput"
+                           value="1" min="1" max="@Model.Product.Stock"
+                           class="form-control text-center mx-2" style="width:80px;" />
+
+                    <button type="button" class="btn btn-outline-secondary" id="increaseBtn">+</button>
+
+                    @if (!Model.IsInCart)
+                    {
+                        <form method="post" asp-page-handler="AddToCart" class="ms-3">
+                            <button type="submit" class="btn btn-primary">
+                                افزودن به سبد خرید
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form method="post" asp-page-handler="RemoveFromCart" class="ms-3">
+                            <button type="submit" class="btn btn-danger">
+                                حذف از سبد خرید
+                            </button>
+                        </form>
+                    }
+
+                </div>
+            }
+            else
+            {
+                <p class="text-danger fw-bold mt-3">این محصول موجود نیست.</p>
+            }
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const dec = document.getElementById('decreaseBtn');
+        const inc = document.getElementById('increaseBtn');
+        const qty = document.getElementById('quantityInput');
+
+        dec.addEventListener('click', () => {
+            let v = parseInt(qty.value);
+            if (v > 1) qty.value = v - 1;
+        });
+
+        inc.addEventListener('click', () => {
+            let v = parseInt(qty.value);
+            if (v < @Model.Product.Stock) qty.value = v + 1;
+        });
+    </script>
+}

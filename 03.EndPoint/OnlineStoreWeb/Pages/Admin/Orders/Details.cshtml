@@ -1,0 +1,195 @@
+﻿@page "{id:int}"
+@model OnlineStoreWeb.Pages.Admin.Orders.DetailsModel
+@{
+    ViewData["Title"] = "جزئیات سفارش";
+
+    if (Model.Order == null)
+    {
+        <div class="alert alert-danger text-center">
+            سفارش مورد نظر یافت نشد.
+            <a asp-page="./Index" class="btn btn-primary mt-3">بازگشت به لیست سفارشات</a>
+        </div>
+        return;
+    }
+
+    var order = Model.Order;
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="text-primary">
+                جزئیات سفارش <strong class="text-dark">№@order.Id</strong>
+            </h3>
+            <div>
+                <a asp-page="./Index" class="btn btn-secondary me-2 no-print">بازگشت به لیست</a>
+                <button class="btn btn-success no-print" onclick="window.print()">
+                    چاپ فاکتور
+                </button>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="alert alert-success alert-dismissible fade show no-print">
+                @Model.SuccessMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-primary text-white">
+                        اطلاعات سفارش
+                    </div>
+                    <div class="card-body">
+                        <p><strong>شماره سفارش:</strong> #@order.Id</p>
+                        <p><strong>مشتری:</strong> @order.UserName</p>
+                        <p>
+                            <strong>تاریخ ثبت:</strong><br>
+                            <span dir="ltr" class="d-block text-start fw-bold">
+                                @order.CreatedAt.ToString("yyyy/MM/dd")
+                            </span>
+                            <small class="text-muted">@order.CreatedAt.ToString("HH:mm:ss")</small>
+                        </p>
+                        <p>
+                            <strong>وضعیت:</strong>
+                            <span class="badge bg-success fs-6">تکمیل شده</span>
+                        </p>
+                        <p>
+                            <strong>جمع کل:</strong>
+                            <span class="fs-4 text-success fw-bold">
+                                @String.Format("{0:N0}", order.TotalPrice) تومان
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-dark text-white">
+                        محصولات سفارش داده شده (@order.Items.Count آیتم)
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>محصول</th>
+                                        <th class="text-center">تعداد</th>
+                                        <th>قیمت واحد</th>
+                                        <th>مجموع</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in order.Items)
+                                    {
+                                        <tr>
+                                            <td><strong>@item.ProductTitle</strong></td>
+                                            <td class="text-center">
+                                                <span class="badge bg-info">@item.Quantity</span>
+                                            </td>
+                                            <td>@String.Format("{0:N0}", item.UnitPrice) تومان</td>
+                                            <td class="text-end fw-bold text-success">
+                                                @String.Format("{0:N0}", item.UnitPrice * item.Quantity) تومان
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot class="table-dark">
+                                    <tr>
+                                        <td colspan="3" class="text-end fw-bold fs-5 text-white">جمع کل:</td>
+                                        <td class="text-end fw-bold fs-4 text-white">
+                                            @String.Format("{0:N0}", order.TotalPrice) تومان
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card border-warning">
+                    <div class="card-body">
+                        <h5 class="text-warning mb-3">نکات مهم</h5>
+                        <ul class="mb-0">
+                            <li>این سفارش با موفقیت پرداخت و تکمیل شده است.</li>
+                            <li>موجودی محصولات از انبار کسر شده است.</li>
+                            <li>موجودی مشتری به مبلغ سفارش کسر شده است.</li>
+                            <li>سبد خرید مشتری پس از ثبت سفارش پاک شده است.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @@media print {
+        .no-print {
+            display: none !important;
+        }
+        body {
+            background: white !important;
+            color: black !important;
+            font-family: Tahoma, Arial, sans-serif !important;
+            font-size: 12pt !important;
+            direction: rtl !important;
+        }
+        .card {
+            border: 2px solid #000 !important;
+            box-shadow: none !important;
+            page-break-inside: avoid;
+        }
+
+        .card-header {
+            background-color: #f0f0f0 !important;
+            color: black !important;
+            font-weight: bold !important;
+            border-bottom: 2px solid #000 !important;
+        }
+        .table {
+            border-collapse: collapse !important;
+            width: 100% !important;
+        }
+
+            .table th,
+            .table td {
+                border: 1px solid #000 !important;
+                padding: 10px !important;
+                text-align: right !important;
+            }
+
+            .table thead {
+                background-color: #e0e0e0 !important;
+            }
+
+            .table tfoot {
+                background-color: #d0d0d0 !important;
+                font-weight: bold !important;
+            }
+        .text-success,
+        .text-primary,
+        .text-warning,
+        .text-danger,
+        .text-dark {
+            color: #000 !important;
+            font-weight: bold !important;
+        }
+        .badge {
+            color: #000 !important;
+            background-color: #ddd !important;
+            border: 1px solid #000 !important;
+        }
+        .fs-4, .fs-5 {
+            font-size: 14pt !important;
+        }
+    }
+</style>

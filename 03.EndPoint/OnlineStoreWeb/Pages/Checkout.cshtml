@@ -1,0 +1,49 @@
+﻿@page
+@model OnlineStoreWeb.Pages.CheckoutModel
+@{
+    ViewData["Title"] = "تسویه حساب";
+}
+
+<h2 class="mb-4">تسویه حساب</h2>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+@if (Model.CartItems != null && Model.CartItems.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>محصول</th>
+                <th>تعداد</th>
+                <th>قیمت واحد</th>
+                <th>مجموع</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.CartItems)
+            {
+                <tr>
+                    <td>@item.ProductTitle</td>
+                    <td>@item.Quantity</td>
+                    <td>@String.Format("{0:N0}", item.UnitPrice) تومان</td>
+                    <td>@String.Format("{0:N0}", item.UnitPrice * item.Quantity) تومان</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="text-end mt-3">
+        <h4>جمع کل: <strong>@String.Format("{0:N0}", Model.TotalPrice)</strong> تومان</h4>
+    </div>
+
+    <form method="post" asp-page-handler="Checkout" class="mt-4">
+        <button type="submit" class="btn btn-success btn-lg">تسویه حساب و ثبت سفارش</button>
+    </form>
+}
+else
+{
+    <p>سبد خرید شما خالی است.</p>
+}

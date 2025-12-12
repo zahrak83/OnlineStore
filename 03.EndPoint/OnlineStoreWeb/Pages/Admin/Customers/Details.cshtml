@@ -1,0 +1,123 @@
+﻿@page "{id:int}"
+@model OnlineStoreWeb.Pages.Admin.Customers.DetailsModel
+@{
+    ViewData["Title"] = "جزئیات مشتری";
+    var customer = Model.Customer!;
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="text-primary">
+                جزئیات مشتری: <strong>@customer.Username</strong>
+            </h3>
+            <a asp-page="./Index" class="btn btn-secondary">
+                بازگشت به لیست مشتریان
+            </a>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                @Model.SuccessMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger alert-dismissible fade show">
+                @Model.ErrorMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-primary text-white">
+                        اطلاعات کلی
+                    </div>
+                    <div class="card-body">
+                        <p><strong>شناسه:</strong> #@customer.Id</p>
+                        <p><strong>نام کاربری:</strong> @customer.Username</p>
+                        <p>
+                            <strong>موجودی فعلی:</strong>
+                            <span class="badge bg-success fs-5">@String.Format("{0:N0}", customer.Balance) تومان</span>
+                        </p>
+                        <p><strong>مجموع خرید:</strong> @String.Format("{0:N0}", customer.TotalPrice) تومان</p>
+                        <p><strong>تعداد سفارش:</strong> @customer.TotalOrders سفارش</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header @(customer.CurrentCart.Any() ? "bg-warning" : "bg-info") text-white">
+                        سبد خرید فعلی (@customer.CurrentCart.Sum(i => i.Quantity) آیتم)
+                    </div>
+                    <div class="card-body">
+                        @if (!customer.CurrentCart.Any())
+                        {
+                            <p class="text-muted text-center">سبد خرید خالی است</p>
+                        }
+                        else
+                        {
+                            <ul class="list-group list-group-flush">
+                                @foreach (var item in customer.CurrentCart)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>@item.ProductTitle × @item.Quantity</span>
+                                        <strong>@String.Format("{0:N0}", item.UnitPrice * item.Quantity) تومان</strong>
+                                    </li>
+                                }
+                            </ul>
+                            <hr />
+                            <div class="text-end fw-bold">
+                                جمع: @String.Format("{0:N0}", customer.CurrentCart.Sum(i => i.UnitPrice * i.Quantity)) تومان
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mt-4">
+            <div class="card-header bg-dark text-white">
+                تاریخچه سفارشات (@customer.Orders.Count سفارش)
+            </div>
+            <div class="card-body p-0">
+                @if (!customer.Orders.Any())
+                {
+                    <p class="text-center text-muted py-4">هنوز سفارشی ثبت نکرده است.</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>شماره سفارش</th>
+                                    <th>تاریخ</th>
+                                    <th>تعداد آیتم</th>
+                                    <th>مبلغ کل</th>
+                                    <th>وضعیت</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var order in customer.Orders)
+                                {
+                                    <tr>
+                                        <td><strong>#@order.OrderId</strong></td>
+                                        <td>@order.OrderDate:ToPersianDate()</td>
+                                        <td>@order.ItemsCount آیتم</td>
+                                        <td>@String.Format("{0:N0}", order.TotalPrice) تومان</td>
+                                        <td><span class="badge bg-success">تکمیل شده</span></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

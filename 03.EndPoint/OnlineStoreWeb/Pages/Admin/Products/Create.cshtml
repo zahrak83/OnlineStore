@@ -1,0 +1,138 @@
+﻿@page
+@model OnlineStoreWeb.Pages.Admin.Products.CreateModel
+@{
+    ViewData["Title"] = "افزودن محصول جدید";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-9">
+        <h3 class="mb-4 text-primary">
+            افزودن محصول جدید
+        </h3>
+
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="alert alert-success alert-dismissible fade show">
+                @Model.SuccessMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger alert-dismissible fade show">
+                @Model.ErrorMessage
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="mb-3">
+                                <label asp-for="Product.Title" class="form-label">عنوان محصول <span class="text-danger">*</span></label>
+                                <input asp-for="Product.Title" class="form-control" placeholder="مثال: لپ‌تاپ لنوو Ideapad 3" />
+                                <span asp-validation-for="Product.Title" class="text-danger"></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="Product.Price" class="form-label">قیمت (تومان) <span class="text-danger">*</span></label>
+                                        <input asp-for="Product.Price" class="form-control" />
+                                        <span asp-validation-for="Product.Price" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="Product.Stock" class="form-label">موجودی <span class="text-danger">*</span></label>
+                                        <input asp-for="Product.Stock" class="form-control" />
+                                        <span asp-validation-for="Product.Stock" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Product.CategoryId" class="form-label">دسته‌بندی <span class="text-danger">*</span></label>
+                                <select asp-for="Product.CategoryId" class="form-select" asp-items="@(new SelectList(Model.Categories, "Id", "Name"))">
+                                    <option value="">-- یک دسته‌بندی انتخاب کنید --</option>
+                                </select>
+                                <span asp-validation-for="Product.CategoryId" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Product.Description" class="form-label">توضیحات محصول</label>
+                                <textarea asp-for="Product.Description" class="form-control" rows="5" placeholder="ویژگی‌ها، مشخصات فنی و ..."></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Product.ImageFiles" class="form-label">تصاویر محصول (حداکثر ۵ تصویر)</label>
+                                <input asp-for="Product.ImageFiles" type="file" class="form-control" accept="image/*" multiple />
+                                <div class="form-text text-muted">
+                                    فرمت‌های مجاز: JPG, PNG, WebP — حداکثر ۲ مگابایت هر عکس
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="border rounded p-3 bg-light">
+                                <h5 class="mb-3">پیش‌نمایش تصاویر</h5>
+                                <div id="image-preview" class="d-flex flex-wrap gap-2"></div>
+                                <div class="text-center text-muted mt-3" id="no-image-text">
+                                    هنوز تصویری انتخاب نشده
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-success btn-lg px-5">
+                            ثبت محصول
+                        </button>
+                        <a asp-page="./Index" class="btn btn-secondary btn-lg">
+                            بازگشت به لیست محصولات
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        const fileInput = document.querySelector('input[type="file"]');
+        const preview = document.getElementById('image-preview');
+        const noImageText = document.getElementById('no-image-text');
+
+        fileInput.addEventListener('change', function () {
+            preview.innerHTML = '';
+            if (this.files.length === 0) {
+                noImageText.style.display = 'block';
+                return;
+            }
+            noImageText.style.display = 'none';
+
+            Array.from(this.files).slice(0, 5).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'rounded shadow-sm';
+                        img.style.width = '90px';
+                        img.style.height = '90px';
+                        img.style.objectFit = 'cover';
+                        preview.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+    </script>
+}

@@ -7,19 +7,6 @@ namespace OnlineStore.Domain.AppService
 {
     public class UserAppService(IUserService userService) : IUserAppService
     {
-        public async Task<Result<UserDto>> LoginAsync(UserLoginDto dto, CancellationToken cancellationToken)
-        {
-            if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
-                return Result<UserDto>.Failure("نام کاربری یا رمز عبور اشتباه است.");
-
-            var user = await userService.LoginAsync(dto, cancellationToken);
-
-            if (user == null)
-                return Result<UserDto>.Failure("کاربری با این اطلاعات یافت نشد.");
-
-            return Result<UserDto>.Success("ورود موفقیت‌آمیز.", user);
-        }
-
         public async Task<Result<UserDto>> GetUserAsync(int id, CancellationToken cancellationToken)
         {
             var user = await userService.GetByIdAsync(id, cancellationToken);

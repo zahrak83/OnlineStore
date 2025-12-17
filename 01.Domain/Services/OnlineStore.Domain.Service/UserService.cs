@@ -11,11 +11,6 @@ namespace OnlineStore.Domain.Service
             return await  userRepository.GetUserByIdAsync(id, cancellationToken);
         }
 
-        public async Task<UserDto?> LoginAsync(UserLoginDto dto, CancellationToken cancellationToken)
-        {
-           return await userRepository.LoginAsync(dto, cancellationToken);
-        }
-
         public async Task<decimal> GetBalanceAsync(int userId, CancellationToken cancellationToken)
         {
            return await userRepository.GetBalanceAsync(userId, cancellationToken);
@@ -25,6 +20,7 @@ namespace OnlineStore.Domain.Service
         {
            return await userRepository.UpdateBalanceAsync(userId, newBalance, cancellationToken);
         }
+     
         public async Task<List<UserDto>> GetAllCustomersAsync(CancellationToken cancellationToken)
         {
             return await userRepository.GetAllCustomersAsync(cancellationToken);

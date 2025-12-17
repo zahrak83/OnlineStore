@@ -1,8 +1,11 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using OnlineStore.Domain.AppService;
 using OnlineStore.Domain.Core.Contract.IAppService;
 using OnlineStore.Domain.Core.Contract.IRepository;
 using OnlineStore.Domain.Core.Contract.IService;
+using OnlineStore.Domain.Core.Entities;
 using OnlineStore.Domain.Service;
 using OnlineStore.Infra.Database;
 using OnlineStore.Infra.Repository;
@@ -12,7 +15,7 @@ using Serilog;
 
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug()
+    .MinimumLevel.Information()
     .WriteTo.Console()            
     .WriteTo.File("Logs/log-.txt")
     .WriteTo.Seq("http://localhost:5341") 
@@ -56,8 +59,23 @@ builder.Services.AddScoped<ICategoryAppService, CategoryAppService>();
 builder.Services.AddScoped<IImageAppService, ImageAppService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(@"Server=DESKTOP-DG1LLR4\SQLEXPRESS;Database=OnlineStore;Integrated Security=true;TrustServerCertificate=true;"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection"))
+        .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning)));
+//builder.Services.AddDbContext<AppDbContext>(options =>
+//    options.UseSqlServer(@"Server=DESKTOP-DG1LLR4\SQLEXPRESS;Database=OnlineStore;Integrated Security=true;TrustServerCertificate=true;"));
 
+builder.Services.AddIdentity<User, IdentityRole<int>>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+    options.SignIn.RequireConfirmedEmail = false;
+    options.SignIn.RequireConfirmedPhoneNumber = false;
+})
+.AddEntityFrameworkStores<AppDbContext>()
+.AddDefaultTokenProviders();
 
 builder.Services.AddDistributedMemoryCache(); 
 builder.Services.AddSession(options =>
@@ -87,6 +105,7 @@ app.UseRouting();
 
 app.UseSession();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();

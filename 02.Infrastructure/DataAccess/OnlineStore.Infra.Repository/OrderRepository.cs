@@ -36,7 +36,7 @@ namespace OnlineStore.Infra.Repository
                 .Select(o => new OrderSummaryForAdminDto
                 {
                     Id = o.Id,
-                    UserName = o.User.Username,
+                    UserName = o.User.UserName,
                     TotalPrice = o.TotalPrice,
                     CreatedAt = o.CreatedAt,
                     ItemsCount = o.OrderItems.Sum(oi => oi.Quantity)
@@ -51,7 +51,7 @@ namespace OnlineStore.Infra.Repository
                 .Select(o => new OrderDetailDto
                 {
                     Id = o.Id,
-                    UserName = o.User.Username,
+                    UserName = o.User.UserName,
                     TotalPrice = o.TotalPrice,
                     CreatedAt = o.CreatedAt,
                     Items = o.OrderItems.Select(oi => new OrderItemDetailDto

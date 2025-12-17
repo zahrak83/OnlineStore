@@ -1,12 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using OnlineStore.Domain.Core.Contract.IRepository;
 using OnlineStore.Domain.Core.Dtos;
+using OnlineStore.Domain.Core.Entities;
 using OnlineStore.Domain.Core.enums;
 using OnlineStore.Infra.Database;
 
 namespace OnlineStore.Infra.Repository
 {
-    public class UserRepository(AppDbContext context) : IUserRepository
+    public class UserRepository(AppDbContext context, UserManager<User> userManager) : IUserRepository
     {
         public async Task<UserDto?> GetUserByIdAsync(int id, CancellationToken cancellationToken)
         {
@@ -15,21 +17,7 @@ namespace OnlineStore.Infra.Repository
                 .Select(u => new UserDto
                 {
                     Id = u.Id,
-                    Username = u.Username,
-                    Balance = u.Balance,
-                    Role = u.Role
-                })
-                .FirstOrDefaultAsync(cancellationToken);
-        }
-
-        public async Task<UserDto?> LoginAsync(UserLoginDto dto, CancellationToken cancellationToken)
-        {
-            return await context.Users
-                .Where(u => u.Username == dto.Username && u.Password == dto.Password)
-                .Select(u => new UserDto
-                {
-                    Id = u.Id,
-                    Username = u.Username,
+                    Username = u.UserName,
                     Balance = u.Balance,
                     Role = u.Role
                 })
@@ -62,7 +50,7 @@ namespace OnlineStore.Infra.Repository
                 .Select(u => new UserDto
                 {
                     Id = u.Id,
-                    Username = u.Username,
+                    Username = u.UserName,
                     Balance = u.Balance,
                     Role = u.Role
                 })
@@ -77,7 +65,7 @@ namespace OnlineStore.Infra.Repository
                 .Select(u => new UserDetailDto
                 {
                     Id = u.Id,
-                    Username = u.Username,
+                    Username = u.UserName,
                     Balance = u.Balance,
                     TotalOrders = u.Orders.Count,
                     TotalPrice = u.Orders.Sum(o => o.TotalPrice),

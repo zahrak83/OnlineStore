@@ -27,6 +27,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Areas\Account\Pages\" />
+    <Folder Include="Areas\Admin\Pages\Category\" />
+    <Folder Include="Areas\Admin\Pages\Customer\" />
+    <Folder Include="Areas\Admin\Pages\Product\" />
+    <Folder Include="Areas\Admin\Pages\Order\" />
+    <Folder Include="Areas\Shared\Pages\" />
     <Folder Include="wwwroot\images\products\" />
   </ItemGroup>
 

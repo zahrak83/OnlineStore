@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using OnlineStore.Domain.Core.Contract.IAppService;
 using OnlineStore.Domain.Core.Dtos;
@@ -6,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OnlineStoreWeb.Pages.Admin.Categories
 {
+    [Authorize(Roles = "Admin")]
     public class EditModel : PageModel
     {
         private readonly ICategoryAppService _categoryService;

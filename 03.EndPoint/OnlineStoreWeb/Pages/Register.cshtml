@@ -1,18 +1,20 @@
 ﻿@page
-@model OnlineStore.Web.Pages.LoginModel
+@model OnlineStoreWeb.Pages.RegisterModel
 @{
-    ViewData["Title"] = "ورود";
+    ViewData["Title"] = "ثبت‌نام";
 }
 
 <div class="row justify-content-center mt-5">
     <div class="col-md-4">
         <div class="card shadow-sm">
             <div class="card-body">
-                <h4 class="card-title mb-3">ورود به فروشگاه</h4>
+                <h4 class="card-title mb-3">ثبت‌نام در فروشگاه</h4>
 
                 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
                 {
-                    <div class="alert alert-danger">@Model.ErrorMessage</div>
+                    <div class="alert alert-danger">
+                        @Html.Raw(Model.ErrorMessage)
+                    </div>
                 }
 
                 <form method="post" novalidate>
@@ -28,13 +30,18 @@
                         <span class="text-danger" asp-validation-for="Password"></span>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100">ورود</button>
-                    <div class="mt-3 text-center">
-                        <a asp-page="/Register">ثبت‌نام</a>
-                        <span class="mx-2 text-muted">|</span>
-                        <a asp-page="/ForgotPassword">رمز عبور خود را فراموش کرده‌اید؟</a>
+                    <div class="mb-3">
+                        <label asp-for="ConfirmPassword" class="form-label"></label>
+                        <input asp-for="ConfirmPassword" class="form-control @(ViewData.ModelState.ContainsKey(nameof(Model.ConfirmPassword)) && ViewData.ModelState[nameof(Model.ConfirmPassword)].Errors.Count > 0 ? "is-invalid" : "")" />
+                        <span class="text-danger" asp-validation-for="ConfirmPassword"></span>
                     </div>
+
+                    <button type="submit" class="btn btn-success w-100">ثبت‌نام</button>
                 </form>
+
+                <div class="mt-3 text-center">
+                    <a asp-page="/Login">قبلاً ثبت‌نام کرده‌اید؟ ورود</a>
+                </div>
             </div>
         </div>
     </div>

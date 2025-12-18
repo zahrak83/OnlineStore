@@ -1,21 +1,22 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using OnlineStore.Domain.Core.Entities;
 
 namespace OnlineStoreWeb.Pages
 {
     public class LogoutModel : PageModel
     {
-        private readonly ILogger<LogoutModel> _logger;
+        private readonly SignInManager<User> _signInManager;
 
-        public LogoutModel(ILogger<LogoutModel> logger)
+        public LogoutModel(SignInManager<User> signInManager)
         {
-            _logger = logger;
+            _signInManager = signInManager;
         }
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnPostAsync()
         {
-            HttpContext.Session.Clear();
-            _logger.LogInformation("User logged out.");
+            await _signInManager.SignOutAsync();
             return RedirectToPage("/Index");
         }
     }

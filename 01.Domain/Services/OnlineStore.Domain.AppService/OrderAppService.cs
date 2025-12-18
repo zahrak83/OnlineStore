@@ -7,36 +7,36 @@ namespace OnlineStore.Domain.AppService
 {
     public class OrderAppService(IOrderService orderService, IUserService userService, ICartItemService cartItemService, IProductService productService) : IOrderAppService
     {
-        public async Task<Result<int>> CreateOrderAsync(OrderCreateDto dto, CancellationToken cancellationToken)
+        public async Task<Result<int>> CreateOrderAsync(OrderCreateDto dto,CancellationToken cancellationToken)
         {
             if (dto.Items == null || dto.Items.Count == 0)
                 return Result<int>.Failure("سبد خرید خالی است.");
 
+
             foreach (var item in dto.Items)
             {
-                var stock = await productService.GetStockAsync(item.ProductId, cancellationToken);
+                var stockDecreased = await productService.DecreaseStockAsync(item.ProductId, item.Quantity, cancellationToken);
 
-                if (stock == null)
-                    return Result<int>.Failure($"محصولی با شناسه {item.ProductId} یافت نشد.");
-
-                if (stock < item.Quantity)
-                    return Result<int>.Failure($"موجودی محصول '{item.ProductId}' کافی نیست.");
+                if (!stockDecreased)
+                    return Result<int>.Failure($"موجودی محصول با شناسه {item.ProductId} کافی نیست.");
             }
 
             var balance = await userService.GetBalanceAsync(dto.UserId, cancellationToken);
             if (balance < dto.TotalPrice)
-                return Result<int>.Failure("موجودی کافی نیست.");
+                return Result<int>.Failure("موجودی حساب کافی نیست.");
 
             var orderId = await orderService.CreateOrderAsync(dto, cancellationToken);
             if (orderId <= 0)
                 return Result<int>.Failure("ایجاد سفارش با خطا مواجه شد.");
 
-
             var balanceUpdated = await userService.UpdateBalanceAsync(dto.UserId, balance - dto.TotalPrice, cancellationToken);
-            if (!balanceUpdated)
-                return Result<int>.Failure("خطا در بروزرسانی موجودی.");
 
-            var cartCleared = await cartItemService.ClearCartAsync(dto.UserId, cancellationToken);
+            if (!balanceUpdated)
+                return Result<int>.Failure("خطا در بروزرسانی موجودی حساب.");
+
+            var cartCleared = await cartItemService
+                .ClearCartAsync(dto.UserId, cancellationToken);
+
             if (!cartCleared)
                 return Result<int>.Failure("خطا در پاک کردن سبد خرید.");
 

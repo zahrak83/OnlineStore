@@ -4,7 +4,7 @@
     ViewData["Title"] = "جزئیات محصول";
 }
 
-@if (Model.ErrorMessage != null)
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
 {
     <div class="alert alert-danger">@Model.ErrorMessage</div>
 }
@@ -22,7 +22,9 @@
         <div class="col-md-6">
             <h2 class="fw-bold">@Model.Product.Title</h2>
 
-            <h4 class="text-primary my-3">@String.Format("{0:N0}", Model.Product.Price) تومان</h4>
+            <h4 class="text-primary my-3">
+                @String.Format("{0:N0}", Model.Product.Price) تومان
+            </h4>
 
             <p>@Model.Product.Description</p>
 
@@ -32,43 +34,48 @@
                 </span>
             </p>
 
-
             @if (Model.Product.Stock > 0)
             {
-                <div class="mt-4 d-flex align-items-center">
+                <form method="post"
+                      asp-page-handler="AddToCart"
+                      class="mt-4 d-flex align-items-center">
 
                     <button type="button" class="btn btn-outline-secondary" id="decreaseBtn">-</button>
 
-                    <input type="number" name="Quantity" id="quantityInput"
-                           value="1" min="1" max="@Model.Product.Stock"
-                           class="form-control text-center mx-2" style="width:80px;" />
+                    <input type="number"
+                           id="quantityInput"
+                           value="1"
+                           min="1"
+                           max="@Model.Product.Stock"
+                           class="form-control text-center mx-2"
+                           style="width:80px;" />
 
                     <button type="button" class="btn btn-outline-secondary" id="increaseBtn">+</button>
 
-                    @if (!Model.IsInCart)
+                    <input type="hidden" name="Quantity" id="quantityHidden" value="1" />
+
+                    @if (User.Identity?.IsAuthenticated == true)
                     {
-                        <form method="post" asp-page-handler="AddToCart" class="ms-3">
-                            <button type="submit" class="btn btn-primary">
-                                افزودن به سبد خرید
-                            </button>
-                        </form>
+                        <button type="submit" class="btn btn-primary ms-3">
+                            افزودن به سبد خرید
+                        </button>
                     }
                     else
                     {
-                        <form method="post" asp-page-handler="RemoveFromCart" class="ms-3">
-                            <button type="submit" class="btn btn-danger">
-                                حذف از سبد خرید
-                            </button>
-                        </form>
+                        <a asp-page="/Account/Login"
+                           asp-route-returnUrl="@Url.Page("/ProductDetails", new { id = Model.Product.Id })"
+                           class="btn btn-primary ms-3">
+                            افزودن به سبد خرید
+                        </a>
                     }
-
-                </div>
+                </form>
             }
             else
             {
-                <p class="text-danger fw-bold mt-3">این محصول موجود نیست.</p>
+                <p class="text-danger fw-bold mt-3">
+                    این محصول موجود نیست.
+                </p>
             }
-
         </div>
     </div>
 </div>
@@ -78,15 +85,28 @@
         const dec = document.getElementById('decreaseBtn');
         const inc = document.getElementById('increaseBtn');
         const qty = document.getElementById('quantityInput');
+        const hidden = document.getElementById('quantityHidden');
 
-        dec.addEventListener('click', () => {
+        function sync() {
+            hidden.value = qty.value;
+        }
+
+        dec?.addEventListener('click', () => {
             let v = parseInt(qty.value);
-            if (v > 1) qty.value = v - 1;
+            if (v > 1) {
+                qty.value = v - 1;
+                sync();
+            }
         });
 
-        inc.addEventListener('click', () => {
+        inc?.addEventListener('click', () => {
             let v = parseInt(qty.value);
-            if (v < @Model.Product.Stock) qty.value = v + 1;
+            if (v < @Model.Product.Stock) {
+                qty.value = v + 1;
+                sync();
+            }
         });
+
+        qty?.addEventListener('change', sync);
     </script>
 }

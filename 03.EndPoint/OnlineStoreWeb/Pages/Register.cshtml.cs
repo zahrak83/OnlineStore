@@ -2,16 +2,15 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using OnlineStore.Domain.Core.Contract.IAppService;
 using OnlineStore.Domain.Core.Dtos;
-using OnlineStore.Domain.Core.enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace OnlineStore.Web.Pages
+namespace OnlineStoreWeb.Pages
 {
-    public class LoginModel : PageModel
+    public class RegisterModel : PageModel
     {
         private readonly IUserAppService _userAppService;
 
-        public LoginModel(IUserAppService userAppService)
+        public RegisterModel(IUserAppService userAppService)
         {
             _userAppService = userAppService;
         }
@@ -25,6 +24,10 @@ namespace OnlineStore.Web.Pages
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
+        [BindProperty]
+        [Compare(nameof(Password), ErrorMessage = "رمز عبور و تکرار آن یکسان نیست.")]
+        public string ConfirmPassword { get; set; }
+
         public string? ErrorMessage { get; set; }
 
         public async Task<IActionResult> OnPostAsync()
@@ -32,9 +35,9 @@ namespace OnlineStore.Web.Pages
             if (!ModelState.IsValid)
                 return Page();
 
-            var result = await _userAppService.LoginAsync(new UserLoginDto
+            var result = await _userAppService.RegisterAsync(new RegisterDto
             {
-                Username = Username,
+                UserName = Username,
                 Password = Password
             }, HttpContext.RequestAborted);
 
@@ -44,10 +47,7 @@ namespace OnlineStore.Web.Pages
                 return Page();
             }
 
-            if (result.Data!.Role == UserRole.Admin)
-                return RedirectToPage("/Admin/Dashboard");
-
-            return RedirectToPage("/Index");
+            return RedirectToPage("/Login");
         }
     }
 }

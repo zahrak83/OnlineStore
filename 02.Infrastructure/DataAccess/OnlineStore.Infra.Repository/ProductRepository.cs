@@ -127,5 +127,17 @@ namespace OnlineStore.Infra.Repository
                 Images = p.Images.Select(i => i.FilePath).ToList()
             }).ToListAsync(cancellationToken);
         }
+        
+        public async Task<bool> DecreaseStockAsync(int productId, int quantity, CancellationToken cancellationToken)
+        {
+            var affected = await context.Products
+                .Where(p => p.Id == productId && p.Stock >= quantity)
+                .ExecuteUpdateAsync(p => p
+                    .SetProperty(x => x.Stock, x => x.Stock - quantity),
+                    cancellationToken);
+
+            return affected > 0;
+        }
+
     }
 }

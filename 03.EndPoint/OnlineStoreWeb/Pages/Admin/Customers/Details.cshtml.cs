@@ -1,18 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using OnlineStore.Domain.Core.Contract.IAppService;
 using OnlineStore.Domain.Core.Dtos;
 
 namespace OnlineStoreWeb.Pages.Admin.Customers
 {
+    [Authorize(Roles = "Admin")]
     public class DetailsModel : PageModel
     {
         private readonly IUserAppService _userService;
         private readonly ILogger<DetailsModel> _logger;
 
-        public DetailsModel(
-            IUserAppService userService,
-            ILogger<DetailsModel> logger)
+        public DetailsModel(IUserAppService userService, ILogger<DetailsModel> logger)
         {
             _userService = userService;
             _logger = logger;

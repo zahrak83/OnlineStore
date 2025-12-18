@@ -17,20 +17,26 @@
             <div class="container">
                 <a class="navbar-brand" href="/">فروشگاه</a>
                 <div class="collapse navbar-collapse">
-                    <ul class="navbar-nav ms-auto">
-                        @if (Context.Session.GetInt32("UserId") != null)
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        @if (User.Identity?.IsAuthenticated == true)
                         {
-                            var role = Context.Session.GetInt32("UserRole");
-
-                            if (role == 0)
+                            @* مشتری *@
+                            @if (User.IsInRole("Customer"))
                             {
                                 <li class="nav-item">
+                                    <a class="nav-link" asp-page="/UserProfile">
+                                        <i class="bi bi-person-circle"></i> پروفایل
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a class="nav-link" asp-page="/Cart">
-                                        <i class="bi bi-cart-fill"></i>
+                                        <i class="bi bi-cart-fill"></i> سبد خرید
                                     </a>
                                 </li>
                             }
-                            else if (role == 1)
+
+                            @* ادمین *@
+                            @if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
                                     <a class="nav-link" asp-page="/Admin/Dashboard">پنل مدیریت</a>
@@ -38,7 +44,9 @@
                             }
 
                             <li class="nav-item">
-                                <a class="nav-link" asp-page="/Logout">خروج</a>
+                                <form asp-page="/Logout" method="post" class="d-inline">
+                                    <button type="submit" class="nav-link btn btn-link p-0 m-0">خروج</button>
+                                </form>
                             </li>
                         }
                         else

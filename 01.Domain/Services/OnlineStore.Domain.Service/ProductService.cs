@@ -1,6 +1,7 @@
 ﻿using OnlineStore.Domain.Core.Contract.IRepository;
 using OnlineStore.Domain.Core.Contract.IService;
 using OnlineStore.Domain.Core.Dtos;
+using OnlineStore.Infra.Repository;
 
 namespace OnlineStore.Domain.Service
 {
@@ -39,6 +40,14 @@ namespace OnlineStore.Domain.Service
         public Task<List<ProductDto>> FilterAsync(int? categoryId, string? search, string? sort, CancellationToken cancellationToken)
         {
             return repository.FilterAsync(categoryId, search, sort, cancellationToken);
+        }
+
+        public async Task<bool> DecreaseStockAsync(int productId,int quantity,CancellationToken cancellationToken)
+        {
+            if (productId <= 0 || quantity <= 0)
+                return false;
+
+            return await repository.DecreaseStockAsync(productId, quantity, cancellationToken);
         }
     }
 }

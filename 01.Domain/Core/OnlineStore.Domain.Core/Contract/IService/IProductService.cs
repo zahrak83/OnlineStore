@@ -9,7 +9,6 @@ namespace OnlineStore.Domain.Core.Contract.IService
         Task<bool> UpdateProductAsync(ProductDto dto, CancellationToken cancellationToken);
         Task<List<ProductDto>> GetAllAsync(CancellationToken cancellationToken);
         Task<bool> DeleteAsync(int id, CancellationToken cancellationToken);
-        Task<int?> GetStockAsync(int productId, CancellationToken cancellationToken);
         Task<List<ProductDto>> FilterAsync(int? categoryId, string? search, string? sort, CancellationToken cancellationToken);
         Task<bool> DecreaseStockAsync(int productId, int quantity, CancellationToken cancellationToken);
     }

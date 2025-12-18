@@ -22,10 +22,12 @@ namespace OnlineStore.Domain.AppService
             }
 
             var balance = await userService.GetBalanceAsync(dto.UserId, cancellationToken);
+
             if (balance < dto.TotalPrice)
                 return Result<int>.Failure("موجودی حساب کافی نیست.");
 
             var orderId = await orderService.CreateOrderAsync(dto, cancellationToken);
+
             if (orderId <= 0)
                 return Result<int>.Failure("ایجاد سفارش با خطا مواجه شد.");
 

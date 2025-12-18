@@ -12,6 +12,5 @@ namespace OnlineStore.Domain.Core.Contract.IAppService
         Task<Result<UserDto>> LoginAsync(UserLoginDto dto, CancellationToken cancellationToken);
         Task<Result<UserDto>> RegisterAsync(RegisterDto dto, CancellationToken cancellationToken);
         Task<Result<UserDto>> UpdateProfileAsync(UpdateProfileDto dto, CancellationToken cancellationToken);
-        Task<Result<bool>> ChangePasswordAsync(int userId, string currentPassword, string newPassword, CancellationToken cancellationToken);
     }
 }

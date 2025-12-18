@@ -82,14 +82,6 @@ namespace OnlineStore.Infra.Repository
             return affected > 0;
         }
 
-        public async Task<int?> GetStockAsync(int productId, CancellationToken cancellationToken)
-        {
-            return await context.Products
-                .Where(p => p.Id == productId)
-                .Select(p => (int?)p.Stock)
-                .FirstOrDefaultAsync(cancellationToken);
-        }
-
         public async Task<List<ProductDto>> FilterAsync(int? categoryId, string? search, string? sort, CancellationToken cancellationToken)
         {
             var query = context.Products

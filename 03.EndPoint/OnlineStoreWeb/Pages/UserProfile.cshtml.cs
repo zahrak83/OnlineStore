@@ -13,82 +13,76 @@ namespace OnlineStoreWeb.Pages
     [Authorize]
     public class UserProfileModel : PageModel
     {
+        private readonly IUserAppService _userService;
         private readonly UserManager<User> _userManager;
 
-        public UserProfileModel(UserManager<User> userManager)
+        public UserProfileModel(IUserAppService userService, UserManager<User> userManager)
         {
+            _userService = userService;
             _userManager = userManager;
         }
 
         [BindProperty]
         public EditUserProfileDto Input { get; set; } = new();
 
-        [TempData] public string? SuccessMessage { get; set; }
-        [TempData] public string? ErrorMessage { get; set; }
+        [TempData] 
+        public string? SuccessMessage { get; set; }
 
-        public async Task<IActionResult> OnGetAsync()
-        {
-            // گرفتن شناسه کاربر جاری
+        [TempData]
+        public string? ErrorMessage { get; set; }
+
+        public async Task<IActionResult> OnGetAsync() 
+        { 
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (string.IsNullOrEmpty(userIdStr))
-                return RedirectToPage("/Login");
 
-            int userId = int.Parse(userIdStr);
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user == null)
-            {
-                ErrorMessage = "کاربر یافت نشد.";
-                return Page();
-            }
-
-            // پر کردن فرم با داده‌های فعلی
-            Input = new EditUserProfileDto
-            {
+            if (string.IsNullOrEmpty(userIdStr)) 
+                return RedirectToPage("/Login"); 
+            
+            int userId = int.Parse(userIdStr); 
+            
+            var user = await _userManager.FindByIdAsync(userId.ToString()); 
+            
+            if (user == null) { ErrorMessage = "کاربر یافت نشد."; 
+                
+                return Page(); 
+            } 
+            
+            Input = new EditUserProfileDto 
+            { 
                 Username = user.UserName ?? "",
-                Email = user.Email,
+                Email = user.Email, 
                 PhoneNumber = user.PhoneNumber
             };
-
-            return Page();
+            
+            return Page(); 
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
+            {
                 return Page();
+            }
 
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userIdStr))
                 return RedirectToPage("/Login");
 
             int userId = int.Parse(userIdStr);
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user == null)
-            {
-                ErrorMessage = "کاربر یافت نشد.";
-                return Page();
-            }
 
-            // تغییر نام کاربری
-            if (!string.Equals(user.UserName, Input.Username, StringComparison.OrdinalIgnoreCase))
+            var updateDto = new UpdateProfileDto
             {
-                var existingUser = await _userManager.FindByNameAsync(Input.Username);
-                if (existingUser != null && existingUser.Id != user.Id)
-                {
-                    ModelState.AddModelError("Input.Username", "این نام کاربری قبلا استفاده شده است.");
-                    return Page();
-                }
-                user.UserName = Input.Username;
-            }
+                UserId = userId,
+                Username = Input.Username,
+                Email = Input.Email,
+                PhoneNumber = Input.PhoneNumber
+            };
 
-            // تغییر ایمیل و شماره تلفن
-            user.Email = Input.Email;
-            user.PhoneNumber = Input.PhoneNumber;
+            var updateResult = await _userService.UpdateProfileAsync(updateDto, CancellationToken.None);
 
-            var updateResult = await _userManager.UpdateAsync(user);
-            if (!updateResult.Succeeded)
+            if (!updateResult.IsSuccess)
             {
-                ErrorMessage = string.Join(" | ", updateResult.Errors.Select(e => e.Description));
+                ErrorMessage = updateResult.Message;
                 return Page();
             }
 

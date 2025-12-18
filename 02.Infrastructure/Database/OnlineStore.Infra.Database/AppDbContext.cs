@@ -5,8 +5,7 @@ using OnlineStore.Domain.Core.Entities;
 
 namespace OnlineStore.Infra.Database
 {
-    public class AppDbContext(DbContextOptions<AppDbContext> options) 
-        : IdentityDbContext<User,IdentityRole<int>,int>(options)
+    public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<User,IdentityRole<int>,int>(options)
     {
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }

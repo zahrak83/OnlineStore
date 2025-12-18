@@ -32,11 +32,6 @@ namespace OnlineStore.Domain.Service
             return await repository.DeleteAsync(id, cancellationToken);
         }
 
-        public async Task<int?> GetStockAsync(int productId, CancellationToken cancellationToken)
-        {
-            return await repository.GetStockAsync(productId, cancellationToken);
-        }
-
         public Task<List<ProductDto>> FilterAsync(int? categoryId, string? search, string? sort, CancellationToken cancellationToken)
         {
             return repository.FilterAsync(categoryId, search, sort, cancellationToken);

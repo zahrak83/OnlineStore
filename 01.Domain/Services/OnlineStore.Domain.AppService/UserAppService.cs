@@ -56,15 +56,12 @@ namespace OnlineStore.Domain.AppService
             var user = await userManager.FindByNameAsync(dto.Username);
 
             if (user == null)
-                return Result<UserDto>.Failure("نام کاربری یا رمز عبور اشتباه است.");
+                return Result<UserDto>.Failure("نام کاربری اشتباه است.");
 
-            var signInResult = await signInManager.CheckPasswordSignInAsync(
-                user,
-                dto.Password,
-                lockoutOnFailure: true);
+            var signInResult = await signInManager.CheckPasswordSignInAsync(user,dto.Password,lockoutOnFailure: false);
 
             if (!signInResult.Succeeded)
-                return Result<UserDto>.Failure("نام کاربری یا رمز عبور اشتباه است.");
+                return Result<UserDto>.Failure("رمز عبور اشتباه است.");
 
             await signInManager.SignInAsync(user, isPersistent: false);
 
@@ -94,8 +91,7 @@ namespace OnlineStore.Domain.AppService
             var result = await userManager.CreateAsync(user, dto.Password);
 
             if (!result.Succeeded)
-                return Result<UserDto>.Failure(
-                    string.Join(" | ", result.Errors.Select(e => e.Description)));
+                return Result<UserDto>.Failure( string.Join(" | ", result.Errors.Select(e => e.Description)));
 
             var roleName = UserRole.Customer.ToString();
 
@@ -120,8 +116,19 @@ namespace OnlineStore.Domain.AppService
         public async Task<Result<UserDto>> UpdateProfileAsync(UpdateProfileDto dto, CancellationToken cancellationToken)
         {
             var user = await userManager.FindByIdAsync(dto.UserId.ToString());
+
             if (user == null)
                 return Result<UserDto>.Failure("کاربر یافت نشد.");
+
+            if (!string.Equals(user.UserName, dto.Username, StringComparison.OrdinalIgnoreCase))
+            {
+                var existingUser = await userManager.FindByNameAsync(dto.Username);
+
+                if (existingUser != null && existingUser.Id != user.Id)
+                    return Result<UserDto>.Failure("این نام کاربری قبلاً استفاده شده است.");
+
+                user.UserName = dto.Username;
+            }
 
             user.Email = dto.Email;
             user.PhoneNumber = dto.PhoneNumber;
@@ -141,23 +148,6 @@ namespace OnlineStore.Domain.AppService
             };
 
             return Result<UserDto>.Success("پروفایل با موفقیت ویرایش شد.", userDto);
-        }
-
-        public async Task<Result<bool>> ChangePasswordAsync(int userId, string currentPassword, string newPassword, CancellationToken cancellationToken)
-        {
-            var user = await userManager.FindByIdAsync(userId.ToString());
-            if (user == null)
-                return Result<bool>.Failure("کاربر یافت نشد.");
-
-            var result = await userManager.ChangePasswordAsync(user, currentPassword, newPassword);
-
-            if (!result.Succeeded)
-            {
-                var errors = string.Join(" | ", result.Errors.Select(e => e.Description));
-                return Result<bool>.Failure(errors);
-            }
-
-            return Result<bool>.Success("رمز عبور با موفقیت تغییر یافت.", true);
         }
 
     }

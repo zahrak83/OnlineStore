@@ -43,9 +43,6 @@ namespace OnlineStore.Domain.AppService
 
         public async Task<Result<bool>> UpdateAsync(CategoryDto category, CancellationToken cancellationToken)
         {
-            if (category == null)
-                return Result<bool>.Failure("دسته‌بندی نمی‌تواند خالی باشد.");
-
             if (category.Id <= 0)
                 return Result<bool>.Failure("شناسه دسته‌بندی نامعتبر است.");
 
